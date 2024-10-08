@@ -1,0 +1,40 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.3/schema.json",
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf"
+  },
+  "javascript": {
+    "formatter": {
+      "quoteProperties": "asNeeded",
+      "trailingCommas": "all",
+      "semicolons": "asNeeded",
+      "arrowParentheses": "always",
+      "bracketSpacing": true,
+      "bracketSameLine": false,
+      "quoteStyle": "single",
+      "attributePosition": "auto"
+    },
+    "jsxRuntime": "transparent"
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true
+    }
+  },
+  "organizeImports": {
+    "enabled": true
+  },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignore": ["node_modules", "dist", "./src/types/graph.ts"]
+  }
+}

@@ -1,0 +1,38 @@
+enum ItemType {
+  Story
+  Job
+  Comment
+  Poll
+  PollOpt
+}
+
+type Story {
+  author: User!
+  id: Int!
+  replies: [Comment]!
+  score: Int
+  title: String!
+  type: ItemType!
+  url: String
+}
+
+type Comment {
+  author: User!
+  id: Int!
+  replies: [Comment]!
+  text: String
+  type: ItemType!
+}
+
+union Item = Story | Comment
+
+type User {
+  about: String
+  karma: Int
+  username: ID!
+}
+
+type Query {
+  story(id: Int!): Story
+  user(username: ID!): User
+}
