@@ -21,9 +21,15 @@ export type Comment = {
   __typename?: 'Comment';
   author: User;
   id: Scalars['Int']['output'];
-  replies: Array<Maybe<Comment>>;
+  replies: RepliesConnection;
   text?: Maybe<Scalars['String']['output']>;
   type: ItemType;
+};
+
+
+export type CommentRepliesArgs = {
+  after?: InputMaybe<Scalars['Int']['input']>;
+  first?: Scalars['Int']['input'];
 };
 
 export type Item = Comment | Story;
@@ -35,6 +41,11 @@ export enum ItemType {
   PollOpt = 'PollOpt',
   Story = 'Story'
 }
+
+export type PageInfo = {
+  __typename?: 'PageInfo';
+  totalResults: Scalars['Int']['output'];
+};
 
 export type Query = {
   __typename?: 'Query';
@@ -52,15 +63,32 @@ export type QueryUserArgs = {
   username: Scalars['ID']['input'];
 };
 
+export type RepliesConnection = {
+  __typename?: 'RepliesConnection';
+  edges: Array<Maybe<ReplyNode>>;
+  pageInfo?: Maybe<PageInfo>;
+};
+
+export type ReplyNode = {
+  __typename?: 'ReplyNode';
+  node?: Maybe<Comment>;
+};
+
 export type Story = {
   __typename?: 'Story';
   author: User;
   id: Scalars['Int']['output'];
-  replies: Array<Maybe<Comment>>;
+  replies: RepliesConnection;
   score?: Maybe<Scalars['Int']['output']>;
   title: Scalars['String']['output'];
   type: ItemType;
   url?: Maybe<Scalars['String']['output']>;
+};
+
+
+export type StoryRepliesArgs = {
+  after?: InputMaybe<Scalars['Int']['input']>;
+  first?: Scalars['Int']['input'];
 };
 
 export type User = {
@@ -151,7 +179,10 @@ export type ResolversTypes = {
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Item: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['Item']>;
   ItemType: ItemType;
+  PageInfo: ResolverTypeWrapper<PageInfo>;
   Query: ResolverTypeWrapper<{}>;
+  RepliesConnection: ResolverTypeWrapper<RepliesConnection>;
+  ReplyNode: ResolverTypeWrapper<ReplyNode>;
   Story: ResolverTypeWrapper<Story>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   User: ResolverTypeWrapper<User>;
@@ -164,7 +195,10 @@ export type ResolversParentTypes = {
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
   Item: ResolversUnionTypes<ResolversParentTypes>['Item'];
+  PageInfo: PageInfo;
   Query: {};
+  RepliesConnection: RepliesConnection;
+  ReplyNode: ReplyNode;
   Story: Story;
   String: Scalars['String']['output'];
   User: User;
@@ -173,7 +207,7 @@ export type ResolversParentTypes = {
 export type CommentResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Comment'] = ResolversParentTypes['Comment']> = {
   author?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  replies?: Resolver<Array<Maybe<ResolversTypes['Comment']>>, ParentType, ContextType>;
+  replies?: Resolver<ResolversTypes['RepliesConnection'], ParentType, ContextType, RequireFields<CommentRepliesArgs, 'first'>>;
   text?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   type?: Resolver<ResolversTypes['ItemType'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -183,15 +217,31 @@ export type ItemResolvers<ContextType = Context, ParentType extends ResolversPar
   __resolveType: TypeResolveFn<'Comment' | 'Story', ParentType, ContextType>;
 };
 
+export type PageInfoResolvers<ContextType = Context, ParentType extends ResolversParentTypes['PageInfo'] = ResolversParentTypes['PageInfo']> = {
+  totalResults?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   story?: Resolver<Maybe<ResolversTypes['Story']>, ParentType, ContextType, RequireFields<QueryStoryArgs, 'id'>>;
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserArgs, 'username'>>;
 };
 
+export type RepliesConnectionResolvers<ContextType = Context, ParentType extends ResolversParentTypes['RepliesConnection'] = ResolversParentTypes['RepliesConnection']> = {
+  edges?: Resolver<Array<Maybe<ResolversTypes['ReplyNode']>>, ParentType, ContextType>;
+  pageInfo?: Resolver<Maybe<ResolversTypes['PageInfo']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ReplyNodeResolvers<ContextType = Context, ParentType extends ResolversParentTypes['ReplyNode'] = ResolversParentTypes['ReplyNode']> = {
+  node?: Resolver<Maybe<ResolversTypes['Comment']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type StoryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Story'] = ResolversParentTypes['Story']> = {
   author?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  replies?: Resolver<Array<Maybe<ResolversTypes['Comment']>>, ParentType, ContextType>;
+  replies?: Resolver<ResolversTypes['RepliesConnection'], ParentType, ContextType, RequireFields<StoryRepliesArgs, 'first'>>;
   score?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   type?: Resolver<ResolversTypes['ItemType'], ParentType, ContextType>;
@@ -209,7 +259,10 @@ export type UserResolvers<ContextType = Context, ParentType extends ResolversPar
 export type Resolvers<ContextType = Context> = {
   Comment?: CommentResolvers<ContextType>;
   Item?: ItemResolvers<ContextType>;
+  PageInfo?: PageInfoResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  RepliesConnection?: RepliesConnectionResolvers<ContextType>;
+  ReplyNode?: ReplyNodeResolvers<ContextType>;
   Story?: StoryResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 };

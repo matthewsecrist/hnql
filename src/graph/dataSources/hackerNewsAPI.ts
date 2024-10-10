@@ -1,3 +1,4 @@
+import type { CommentRepliesArgs } from '@/types/graph'
 import { RESTDataSource } from '@apollo/datasource-rest'
 import DataLoader from 'dataloader'
 
@@ -67,12 +68,32 @@ export class HackerNewsAPI extends RESTDataSource {
     return await this.itemsLoader.load(id)
   }
 
-  async getItems(ids: number[]): Promise<Item[]> {
+  async getItems(
+    ids: number[],
+    { first = 10, after }: CommentRepliesArgs,
+  ): Promise<Item[]> {
     if (!ids?.length) {
       return []
     }
+
+    // Start at the beginning
+    let startingIndex = 0
+    if (after) {
+      const idx = ids.findIndex((id) => id === after)
+      if (idx === -1) {
+        // out of bounds, return at the end of ids
+        startingIndex = ids.length
+      } else {
+        // found index, move to next id
+        startingIndex = idx + 1
+      }
+    }
+
+    const itemsToLoad = ids.slice(startingIndex, startingIndex + first)
     // Don't use batch because it returns Error | Item
-    return await Promise.all(ids?.map((id) => this.itemsLoader.load(id)))
+    return await Promise.all(
+      itemsToLoad?.map((id) => this.itemsLoader.load(id)),
+    )
   }
 
   async getUser(id: string): Promise<User> {

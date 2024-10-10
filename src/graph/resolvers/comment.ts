@@ -1,8 +1,4 @@
-import type {
-  CommentResolvers,
-  Comment as CommentType,
-  User,
-} from '@/types/graph'
+import type { CommentResolvers, RepliesConnection, User } from '@/types/graph'
 import { serializeComment, serializeUser } from '@/utils/serializers'
 
 export const Comment: CommentResolvers = {
@@ -13,13 +9,24 @@ export const Comment: CommentResolvers = {
 
     return serializeUser(user)
   },
-  replies: async (parent, _, context): Promise<CommentType[]> => {
-    const ids = parent?.replies
-      ?.filter((i) => Boolean(i?.id))
-      ?.map((i) => i?.id) as number[]
+  replies: async (
+    { id },
+    { after, first },
+    context,
+  ): Promise<RepliesConnection> => {
+    const parent = await context.dataSources.hackerNewsApi.getItem(id)
+    const replies = await context.dataSources.hackerNewsApi.getItems(
+      parent.kids,
+      { after, first },
+    )
 
-    const items = await context.dataSources.hackerNewsApi.getItems(ids)
-
-    return items.map(serializeComment)
+    return {
+      pageInfo: {
+        totalResults: parent.descendants ?? 0,
+      },
+      edges: replies.map((reply) => ({
+        node: serializeComment(reply),
+      })),
+    }
   },
 }

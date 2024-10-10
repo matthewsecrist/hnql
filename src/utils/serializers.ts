@@ -20,13 +20,12 @@ export function itemType(type: string): ItemType {
 }
 
 export function serializeComment(item: Item): Comment {
-  const replies = item?.kids?.map((id) => ({ id })) as Comment[]
   const author = { username: item.by } as User
 
   return {
     id: item.id,
     text: item.text,
-    replies,
+    replies: { edges: [], pageInfo: { totalResults: item.descendants ?? 0 } },
     author,
     type: itemType(item.type),
   }
@@ -41,7 +40,6 @@ export function serializeUser(user: HNUser): User {
 }
 
 export function serializeStory(item: Item): Story {
-  const replies = item?.kids?.map((id) => ({ id }))
   const author = { username: item.by } as User
 
   return {
@@ -49,7 +47,7 @@ export function serializeStory(item: Item): Story {
     title: item.title ?? '',
     type: itemType(item.type),
     score: item.score,
-    replies: replies as Comment[],
+    replies: { edges: [], pageInfo: { totalResults: item.descendants ?? 0 } },
     author,
   }
 }

@@ -6,10 +6,23 @@ enum ItemType {
   PollOpt
 }
 
+type PageInfo {
+  totalResults: Int!
+}
+
+type ReplyNode {
+  node: Comment
+}
+
+type RepliesConnection {
+  pageInfo: PageInfo
+  edges: [ReplyNode]!
+}
+
 type Story {
   author: User!
   id: Int!
-  replies: [Comment]!
+  replies(first: Int! = 10, after: Int): RepliesConnection!
   score: Int
   title: String!
   type: ItemType!
@@ -19,7 +32,7 @@ type Story {
 type Comment {
   author: User!
   id: Int!
-  replies: [Comment]!
+  replies(first: Int! = 10, after: Int): RepliesConnection!
   text: String
   type: ItemType!
 }
