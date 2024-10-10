@@ -14,7 +14,7 @@ async function main() {
 
   await server.register(app)
 
-  server.listen({ port: 3000, host: '0.0.0.0' }, (err) => {
+  server.listen({ port: 3000 }, (err) => {
     if (err) {
       server.log.fatal({ err }, 'Server Error')
       process.exit(1)
