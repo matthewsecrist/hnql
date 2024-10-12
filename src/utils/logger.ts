@@ -25,7 +25,7 @@ const loggerOptions: Record<ServiceEnv, LoggerOptions | boolean> = {
       target: 'pino-pretty',
     },
   },
-  prod: shared,
+  production: shared,
   stage: shared,
   test: false,
 }
