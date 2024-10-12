@@ -1,6 +1,7 @@
 # HNQL
 
 A GraphQL API for HackerNews.
+
 https://hnql.onrender.com/graph
 
 ### Running Locally
