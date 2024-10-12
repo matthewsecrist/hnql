@@ -1,7 +1,7 @@
 import Fastify from 'fastify'
 import { app } from './app'
-import { getLoggerConfig } from './utils/logger'
 import { env } from './utils/env'
+import { getLoggerConfig } from './utils/logger'
 
 async function main() {
   const server = Fastify({
