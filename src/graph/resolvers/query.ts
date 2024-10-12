@@ -1,13 +1,41 @@
-import type { QueryResolvers, Story, User } from '@/types/graph'
-import { serializeStory, serializeUser } from '@/utils/serializers'
+import type { QueryResolvers } from '@/types/graph'
+import { NotFound } from '@/utils/errors'
+import {
+  serializeComment,
+  serializeJob,
+  serializePoll,
+  serializePollOption,
+  serializeStory,
+  serializeUser,
+} from '@/utils/serializers'
 
 export const Query: QueryResolvers = {
-  story: async (_, { id }, context): Promise<Story> => {
+  item: async (_, { id }, context) => {
     const item = await context.dataSources.hackerNewsApi.getItem(id)
-    return serializeStory(item)
+    if (!item) {
+      return NotFound(`Item ${id} does not exist`)
+    }
+
+    switch (item.type) {
+      case 'story':
+        return serializeStory(item)
+      case 'comment':
+        return serializeComment(item)
+      case 'job':
+        return serializeJob(item)
+      case 'poll':
+        return serializePoll(item)
+      case 'pollopt':
+        return serializePollOption(item)
+      default:
+        return NotFound(`Item ${id} does not exist`)
+    }
   },
-  user: async (_, { username }, context): Promise<User> => {
+  user: async (_, { username }, context) => {
     const user = await context.dataSources.hackerNewsApi.getUser(username)
+    if (!user) {
+      return NotFound(`User ${username} does not exist.`)
+    }
     return serializeUser(user)
   },
 }
