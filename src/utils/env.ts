@@ -1,4 +1,4 @@
-const ENV_VARS = ['SERVICE_ENV', 'LOG_LEVEL'] as const
+const ENV_VARS = ['SERVICE_ENV', 'LOG_LEVEL', 'PORT'] as const
 
 export type ServiceEnv = 'stage' | 'production' | 'dev' | 'test'
 
