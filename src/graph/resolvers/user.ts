@@ -1,7 +1,7 @@
-import type { UserResolvers } from '@/types/graph'
-import { PaginationSchema } from '@/utils/pagination'
-import { serializeItem } from '@/utils/serializers'
-import { validate } from '@/utils/validate'
+import type { UserResolvers } from '../../types/graph'
+import { PaginationSchema } from '../../utils/pagination'
+import { serializeItem } from '../../utils/serializers'
+import { validate } from '../../utils/validate'
 
 export const User: UserResolvers = {
   items: async ({ username }, { first, after }, context) => {
