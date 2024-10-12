@@ -7,6 +7,7 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -163,8 +164,28 @@ export type StoryRepliesArgs = {
 export type User = {
   __typename?: 'User';
   about?: Maybe<Scalars['String']['output']>;
+  items?: Maybe<UserItemsConnection>;
   karma?: Maybe<Scalars['Int']['output']>;
   username: Scalars['ID']['output'];
+};
+
+
+export type UserItemsArgs = {
+  after?: InputMaybe<Scalars['Int']['input']>;
+  first?: Scalars['Int']['input'];
+};
+
+export type UserItem = Comment | Job | Poll | PollOption | Story;
+
+export type UserItemNode = {
+  __typename?: 'UserItemNode';
+  node?: Maybe<UserItem>;
+};
+
+export type UserItemsConnection = {
+  __typename?: 'UserItemsConnection';
+  edges: Array<Maybe<UserItemNode>>;
+  pageInfo?: Maybe<PageInfo>;
 };
 
 export type UserResult = NotFoundError | User;
@@ -238,64 +259,71 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping of union types */
 export type ResolversUnionTypes<_RefType extends Record<string, unknown>> = {
-  ItemResult: ( Comment ) | ( Job ) | ( NotFoundError ) | ( Poll ) | ( PollOption ) | ( Story );
-  UserResult: ( NotFoundError ) | ( User );
+  ItemResult: ( Omit<Comment, 'author' | 'replies'> & { author: _RefType['User'], replies: _RefType['RepliesConnection'] } ) | ( Omit<Job, 'author'> & { author: _RefType['User'] } ) | ( NotFoundError ) | ( Omit<Poll, 'author' | 'options' | 'replies'> & { author: _RefType['User'], options: _RefType['PollOptionConnection'], replies: _RefType['RepliesConnection'] } ) | ( Omit<PollOption, 'author'> & { author: _RefType['User'] } ) | ( Omit<Story, 'author' | 'replies'> & { author: _RefType['User'], replies: _RefType['RepliesConnection'] } );
+  UserItem: ( Omit<Comment, 'author' | 'replies'> & { author: _RefType['User'], replies: _RefType['RepliesConnection'] } ) | ( Omit<Job, 'author'> & { author: _RefType['User'] } ) | ( Omit<Poll, 'author' | 'options' | 'replies'> & { author: _RefType['User'], options: _RefType['PollOptionConnection'], replies: _RefType['RepliesConnection'] } ) | ( Omit<PollOption, 'author'> & { author: _RefType['User'] } ) | ( Omit<Story, 'author' | 'replies'> & { author: _RefType['User'], replies: _RefType['RepliesConnection'] } );
+  UserResult: ( NotFoundError ) | ( Omit<User, 'items'> & { items?: Maybe<_RefType['UserItemsConnection']> } );
 };
 
 /** Mapping of interface types */
 export type ResolversInterfaceTypes<_RefType extends Record<string, unknown>> = {
   Error: ( NotFoundError );
-  Item: ( Comment ) | ( Job ) | ( Poll ) | ( PollOption ) | ( Story );
+  Item: ( Omit<Comment, 'author' | 'replies'> & { author: _RefType['User'], replies: _RefType['RepliesConnection'] } ) | ( Omit<Job, 'author'> & { author: _RefType['User'] } ) | ( Omit<Poll, 'author' | 'options' | 'replies'> & { author: _RefType['User'], options: _RefType['PollOptionConnection'], replies: _RefType['RepliesConnection'] } ) | ( Omit<PollOption, 'author'> & { author: _RefType['User'] } ) | ( Omit<Story, 'author' | 'replies'> & { author: _RefType['User'], replies: _RefType['RepliesConnection'] } );
 };
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
-  Comment: ResolverTypeWrapper<Comment>;
+  Comment: ResolverTypeWrapper<Omit<Comment, 'author' | 'replies'> & { author: ResolversTypes['User'], replies: ResolversTypes['RepliesConnection'] }>;
   Error: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Error']>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Item: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Item']>;
   ItemResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['ItemResult']>;
   ItemType: ItemType;
-  Job: ResolverTypeWrapper<Job>;
+  Job: ResolverTypeWrapper<Omit<Job, 'author'> & { author: ResolversTypes['User'] }>;
   NotFoundError: ResolverTypeWrapper<NotFoundError>;
   PageInfo: ResolverTypeWrapper<PageInfo>;
-  Poll: ResolverTypeWrapper<Poll>;
-  PollOption: ResolverTypeWrapper<PollOption>;
-  PollOptionConnection: ResolverTypeWrapper<PollOptionConnection>;
-  PollOptionNode: ResolverTypeWrapper<PollOptionNode>;
+  Poll: ResolverTypeWrapper<Omit<Poll, 'author' | 'options' | 'replies'> & { author: ResolversTypes['User'], options: ResolversTypes['PollOptionConnection'], replies: ResolversTypes['RepliesConnection'] }>;
+  PollOption: ResolverTypeWrapper<Omit<PollOption, 'author'> & { author: ResolversTypes['User'] }>;
+  PollOptionConnection: ResolverTypeWrapper<Omit<PollOptionConnection, 'edges'> & { edges: Array<Maybe<ResolversTypes['PollOptionNode']>> }>;
+  PollOptionNode: ResolverTypeWrapper<Omit<PollOptionNode, 'node'> & { node?: Maybe<ResolversTypes['PollOption']> }>;
   Query: ResolverTypeWrapper<{}>;
-  RepliesConnection: ResolverTypeWrapper<RepliesConnection>;
-  ReplyNode: ResolverTypeWrapper<ReplyNode>;
-  Story: ResolverTypeWrapper<Story>;
+  RepliesConnection: ResolverTypeWrapper<Omit<RepliesConnection, 'edges'> & { edges: Array<Maybe<ResolversTypes['ReplyNode']>> }>;
+  ReplyNode: ResolverTypeWrapper<Omit<ReplyNode, 'node'> & { node?: Maybe<ResolversTypes['Comment']> }>;
+  Story: ResolverTypeWrapper<Omit<Story, 'author' | 'replies'> & { author: ResolversTypes['User'], replies: ResolversTypes['RepliesConnection'] }>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
-  User: ResolverTypeWrapper<User>;
+  User: ResolverTypeWrapper<Omit<User, 'items'> & { items?: Maybe<ResolversTypes['UserItemsConnection']> }>;
+  UserItem: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['UserItem']>;
+  UserItemNode: ResolverTypeWrapper<Omit<UserItemNode, 'node'> & { node?: Maybe<ResolversTypes['UserItem']> }>;
+  UserItemsConnection: ResolverTypeWrapper<Omit<UserItemsConnection, 'edges'> & { edges: Array<Maybe<ResolversTypes['UserItemNode']>> }>;
   UserResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['UserResult']>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']['output'];
-  Comment: Comment;
+  Comment: Omit<Comment, 'author' | 'replies'> & { author: ResolversParentTypes['User'], replies: ResolversParentTypes['RepliesConnection'] };
   Error: ResolversInterfaceTypes<ResolversParentTypes>['Error'];
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
   Item: ResolversInterfaceTypes<ResolversParentTypes>['Item'];
   ItemResult: ResolversUnionTypes<ResolversParentTypes>['ItemResult'];
-  Job: Job;
+  Job: Omit<Job, 'author'> & { author: ResolversParentTypes['User'] };
   NotFoundError: NotFoundError;
   PageInfo: PageInfo;
-  Poll: Poll;
-  PollOption: PollOption;
-  PollOptionConnection: PollOptionConnection;
-  PollOptionNode: PollOptionNode;
+  Poll: Omit<Poll, 'author' | 'options' | 'replies'> & { author: ResolversParentTypes['User'], options: ResolversParentTypes['PollOptionConnection'], replies: ResolversParentTypes['RepliesConnection'] };
+  PollOption: Omit<PollOption, 'author'> & { author: ResolversParentTypes['User'] };
+  PollOptionConnection: Omit<PollOptionConnection, 'edges'> & { edges: Array<Maybe<ResolversParentTypes['PollOptionNode']>> };
+  PollOptionNode: Omit<PollOptionNode, 'node'> & { node?: Maybe<ResolversParentTypes['PollOption']> };
   Query: {};
-  RepliesConnection: RepliesConnection;
-  ReplyNode: ReplyNode;
-  Story: Story;
+  RepliesConnection: Omit<RepliesConnection, 'edges'> & { edges: Array<Maybe<ResolversParentTypes['ReplyNode']>> };
+  ReplyNode: Omit<ReplyNode, 'node'> & { node?: Maybe<ResolversParentTypes['Comment']> };
+  Story: Omit<Story, 'author' | 'replies'> & { author: ResolversParentTypes['User'], replies: ResolversParentTypes['RepliesConnection'] };
   String: Scalars['String']['output'];
-  User: User;
+  User: Omit<User, 'items'> & { items?: Maybe<ResolversParentTypes['UserItemsConnection']> };
+  UserItem: ResolversUnionTypes<ResolversParentTypes>['UserItem'];
+  UserItemNode: Omit<UserItemNode, 'node'> & { node?: Maybe<ResolversParentTypes['UserItem']> };
+  UserItemsConnection: Omit<UserItemsConnection, 'edges'> & { edges: Array<Maybe<ResolversParentTypes['UserItemNode']>> };
   UserResult: ResolversUnionTypes<ResolversParentTypes>['UserResult'];
 };
 
@@ -405,8 +433,24 @@ export type StoryResolvers<ContextType = Context, ParentType extends ResolversPa
 
 export type UserResolvers<ContextType = Context, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
   about?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  items?: Resolver<Maybe<ResolversTypes['UserItemsConnection']>, ParentType, ContextType, RequireFields<UserItemsArgs, 'first'>>;
   karma?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   username?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type UserItemResolvers<ContextType = Context, ParentType extends ResolversParentTypes['UserItem'] = ResolversParentTypes['UserItem']> = {
+  __resolveType: TypeResolveFn<'Comment' | 'Job' | 'Poll' | 'PollOption' | 'Story', ParentType, ContextType>;
+};
+
+export type UserItemNodeResolvers<ContextType = Context, ParentType extends ResolversParentTypes['UserItemNode'] = ResolversParentTypes['UserItemNode']> = {
+  node?: Resolver<Maybe<ResolversTypes['UserItem']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type UserItemsConnectionResolvers<ContextType = Context, ParentType extends ResolversParentTypes['UserItemsConnection'] = ResolversParentTypes['UserItemsConnection']> = {
+  edges?: Resolver<Array<Maybe<ResolversTypes['UserItemNode']>>, ParentType, ContextType>;
+  pageInfo?: Resolver<Maybe<ResolversTypes['PageInfo']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -431,6 +475,9 @@ export type Resolvers<ContextType = Context> = {
   ReplyNode?: ReplyNodeResolvers<ContextType>;
   Story?: StoryResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
+  UserItem?: UserItemResolvers<ContextType>;
+  UserItemNode?: UserItemNodeResolvers<ContextType>;
+  UserItemsConnection?: UserItemsConnectionResolvers<ContextType>;
   UserResult?: UserResultResolvers<ContextType>;
 };
 

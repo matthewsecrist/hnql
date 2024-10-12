@@ -88,11 +88,24 @@ type Poll implements Item {
   options(first: Int! = 10, after: Int): PollOptionConnection!
 }
 
+union UserItem = Story | Comment | Job | Poll | PollOption
+
+type UserItemNode {
+  node: UserItem
+}
+
+type UserItemsConnection {
+  pageInfo: PageInfo,
+  edges: [UserItemNode]!
+}
+
 type User {
   about: String
   karma: Int
   username: ID!
+  items(first: Int! = 10, after: Int): UserItemsConnection
 }
+
 
 union ItemResult = Story | Comment | Job | Poll | PollOption | NotFoundError
 union UserResult = User | NotFoundError

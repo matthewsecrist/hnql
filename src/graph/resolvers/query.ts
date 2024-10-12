@@ -1,13 +1,6 @@
 import type { QueryResolvers } from '@/types/graph'
 import { NotFound } from '@/utils/errors'
-import {
-  serializeComment,
-  serializeJob,
-  serializePoll,
-  serializePollOption,
-  serializeStory,
-  serializeUser,
-} from '@/utils/serializers'
+import { serializeItem, serializeUser } from '@/utils/serializers'
 
 export const Query: QueryResolvers = {
   item: async (_, { id }, context) => {
@@ -16,20 +9,7 @@ export const Query: QueryResolvers = {
       return NotFound(`Item ${id} does not exist`)
     }
 
-    switch (item.type) {
-      case 'story':
-        return serializeStory(item)
-      case 'comment':
-        return serializeComment(item)
-      case 'job':
-        return serializeJob(item)
-      case 'poll':
-        return serializePoll(item)
-      case 'pollopt':
-        return serializePollOption(item)
-      default:
-        return NotFound(`Item ${id} does not exist`)
-    }
+    return serializeItem(item)
   },
   user: async (_, { username }, context) => {
     const user = await context.dataSources.hackerNewsApi.getUser(username)

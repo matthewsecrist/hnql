@@ -19,6 +19,21 @@ export function serializeUser(user: HNUser): User {
   }
 }
 
+export function serializeItem(item: Item) {
+  switch (item.type) {
+    case 'story':
+      return serializeStory(item)
+    case 'comment':
+      return serializeComment(item)
+    case 'job':
+      return serializeJob(item)
+    case 'poll':
+      return serializePoll(item)
+    case 'pollopt':
+      return serializePollOption(item)
+  }
+}
+
 export function serializeComment(item: Item): Comment {
   const author = { username: item.by } as User
 
