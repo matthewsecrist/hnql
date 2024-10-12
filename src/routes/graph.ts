@@ -23,6 +23,7 @@ export default fp(async (fastify, opts) => {
     typeDefs: typeDefs,
     resolvers: resolvers,
     plugins: [fastifyApolloDrainPlugin(fastify), landingPage],
+    introspection: true
   })
 
   await apollo.start()
