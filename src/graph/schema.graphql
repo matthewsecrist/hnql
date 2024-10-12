@@ -1,3 +1,13 @@
+interface Error {
+  message: String!
+  code: String!
+}
+
+type NotFoundError implements Error {
+  message: String!
+  code: String!
+}
+
 enum ItemType {
   Story
   Job
@@ -19,7 +29,13 @@ type RepliesConnection {
   edges: [ReplyNode]!
 }
 
-type Story {
+interface Item {
+  author: User!
+  id: Int!
+  type: ItemType!
+}
+
+type Story implements Item {
   author: User!
   id: Int!
   replies(first: Int! = 10, after: Int): RepliesConnection!
@@ -29,23 +45,72 @@ type Story {
   url: String
 }
 
-type Comment {
+type Comment implements Item {
   author: User!
   id: Int!
   replies(first: Int! = 10, after: Int): RepliesConnection!
-  text: String
+  text: String!
   type: ItemType!
 }
 
-union Item = Story | Comment
+type Job implements Item {
+  author: User!
+  id: Int!
+  score: Int
+  title: String!
+  type: ItemType!
+}
+
+type PollOption implements Item {
+  author: User!
+  id: Int!
+  score: Int
+  type: ItemType!
+  text: String!
+}
+
+type PollOptionNode {
+  node: PollOption
+}
+
+type PollOptionConnection {
+  pageInfo: PageInfo,
+  edges: [PollOptionNode]!
+}
+
+type Poll implements Item {
+  author: User!
+  id: Int!
+  score: Int
+  title: String!
+  type: ItemType!
+  replies(first: Int! = 10, after: Int): RepliesConnection!
+  options(first: Int! = 10, after: Int): PollOptionConnection!
+}
+
+union UserItem = Story | Comment | Job | Poll | PollOption
+
+type UserItemNode {
+  node: UserItem
+}
+
+type UserItemsConnection {
+  pageInfo: PageInfo,
+  edges: [UserItemNode]!
+}
 
 type User {
   about: String
   karma: Int
   username: ID!
+  items(first: Int! = 10, after: Int): UserItemsConnection
 }
 
+
+union ItemResult = Story | Comment | Job | Poll | PollOption | NotFoundError
+union UserResult = User | NotFoundError
+
 type Query {
-  story(id: Int!): Story
-  user(username: ID!): User
+  item(id: Int!): ItemResult!
+  user(username: ID!): UserResult!
 }

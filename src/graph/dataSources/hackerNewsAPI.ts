@@ -1,4 +1,3 @@
-import type { CommentRepliesArgs } from '@/types/graph'
 import { RESTDataSource } from '@apollo/datasource-rest'
 import DataLoader from 'dataloader'
 
@@ -7,10 +6,11 @@ export interface Item {
   descendants: number
   id: number
   kids: number[]
+  parts?: number[]
   score: number
   time: number
   title?: string
-  type: string
+  type: 'story' | 'job' | 'comment' | 'poll' | 'pollopt'
   url: string
   text?: string
 }
@@ -70,7 +70,7 @@ export class HackerNewsAPI extends RESTDataSource {
 
   async getItems(
     ids: number[],
-    { first = 10, after }: CommentRepliesArgs,
+    { first = 10, after }: { first: number; after: number | undefined },
   ): Promise<Item[]> {
     if (!ids?.length) {
       return []

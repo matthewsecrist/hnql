@@ -1,13 +1,21 @@
-import type { QueryResolvers, Story, User } from '@/types/graph'
-import { serializeStory, serializeUser } from '@/utils/serializers'
+import type { QueryResolvers } from '@/types/graph'
+import { NotFound } from '@/utils/errors'
+import { serializeItem, serializeUser } from '@/utils/serializers'
 
 export const Query: QueryResolvers = {
-  story: async (_, { id }, context): Promise<Story> => {
+  item: async (_, { id }, context) => {
     const item = await context.dataSources.hackerNewsApi.getItem(id)
-    return serializeStory(item)
+    if (!item) {
+      return NotFound(`Item ${id} does not exist`)
+    }
+
+    return serializeItem(item)
   },
-  user: async (_, { username }, context): Promise<User> => {
+  user: async (_, { username }, context) => {
     const user = await context.dataSources.hackerNewsApi.getUser(username)
+    if (!user) {
+      return NotFound(`User ${username} does not exist.`)
+    }
     return serializeUser(user)
   },
 }
