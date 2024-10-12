@@ -1,6 +1,7 @@
 import Fastify from 'fastify'
 import { app } from './app'
 import { getLoggerConfig } from './utils/logger'
+import { env } from './utils/env'
 
 async function main() {
   const server = Fastify({
@@ -14,7 +15,7 @@ async function main() {
 
   await server.register(app)
 
-  server.listen({ port: 3000 }, (err) => {
+  server.listen({ port: env<number>('PORT', 3000), host: '0.0.0.0' }, (err) => {
     if (err) {
       server.log.fatal({ err }, 'Server Error')
       process.exit(1)
