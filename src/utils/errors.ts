@@ -1,4 +1,4 @@
-import type { NotFoundError } from '@/types/graph'
+import type { NotFoundError } from '../types/graph'
 
 export function NotFound(
   message = `The resource you've requested is not found`,

@@ -1,7 +1,7 @@
-import type { PollResolvers } from '@/types/graph'
-import { PaginationSchema } from '@/utils/pagination'
-import { serializePollOption } from '@/utils/serializers'
-import { validate } from '@/utils/validate'
+import type { PollResolvers } from '../../types/graph'
+import { PaginationSchema } from '../../utils/pagination'
+import { serializePollOption } from '../../utils/serializers'
+import { validate } from '../../utils/validate'
 
 export const Poll: PollResolvers = {
   options: async ({ id }, { first, after }, context) => {

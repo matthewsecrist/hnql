@@ -1,4 +1,4 @@
-import type { Resolvers } from '@/types/graph'
+import type { Resolvers } from '../../types/graph'
 import { Comment } from './comment'
 import { Poll } from './poll'
 import { Query } from './query'

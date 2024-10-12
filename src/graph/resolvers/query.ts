@@ -1,6 +1,6 @@
-import type { QueryResolvers } from '@/types/graph'
-import { NotFound } from '@/utils/errors'
-import { serializeItem, serializeUser } from '@/utils/serializers'
+import type { QueryResolvers } from '../../types/graph'
+import { NotFound } from '../../utils/errors'
+import { serializeItem, serializeUser } from '../../utils/serializers'
 
 export const Query: QueryResolvers = {
   item: async (_, { id }, context) => {

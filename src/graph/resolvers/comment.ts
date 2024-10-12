@@ -1,7 +1,7 @@
-import type { CommentResolvers } from '@/types/graph'
-import { PaginationSchema } from '@/utils/pagination'
-import { serializeComment, serializeUser } from '@/utils/serializers'
-import { validate } from '@/utils/validate'
+import type { CommentResolvers } from '../../types/graph'
+import { PaginationSchema } from '../../utils/pagination'
+import { serializeComment, serializeUser } from '../../utils/serializers'
+import { validate } from '../../utils/validate'
 
 export const Comment: CommentResolvers = {
   author: async (parent, _, context) => {

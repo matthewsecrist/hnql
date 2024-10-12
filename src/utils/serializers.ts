@@ -1,5 +1,5 @@
-import type { Item } from '@/graph/dataSources/hackerNewsAPI'
-import type { User as HNUser } from '@/graph/dataSources/hackerNewsAPI'
+import type { Item } from '../graph/dataSources/hackerNewsAPI'
+import type { User as HNUser } from '../graph/dataSources/hackerNewsAPI'
 import {
   type Comment,
   ItemType,
@@ -8,7 +8,7 @@ import {
   type PollOption,
   type Story,
   type User,
-} from '@/types/graph'
+} from '../types/graph'
 
 export function serializeUser(user: HNUser): User {
   return {
