@@ -1,6 +1,6 @@
 const ENV_VARS = ['SERVICE_ENV', 'LOG_LEVEL'] as const
 
-export type ServiceEnv = 'stage' | 'prod' | 'dev' | 'test'
+export type ServiceEnv = 'stage' | 'production' | 'dev' | 'test'
 
 export type Env = (typeof ENV_VARS)[number]
 
