@@ -10,20 +10,12 @@ import {
   type User,
 } from '@/types/graph'
 
-export function itemType(type: string): ItemType {
-  switch (type) {
-    case 'job':
-      return ItemType.Job
-    case 'comment':
-      return ItemType.Comment
-    case 'poll':
-      return ItemType.Poll
-    case 'pollopt':
-      return ItemType.PollOpt
-    case 'story':
-      return ItemType.Story
-    default:
-      return ItemType.Story
+export function serializeUser(user: HNUser): User {
+  return {
+    __typename: 'User',
+    about: user.about,
+    karma: user.karma,
+    username: user.id,
   }
 }
 
@@ -36,16 +28,7 @@ export function serializeComment(item: Item): Comment {
     id: item.id,
     replies: { edges: [], pageInfo: { totalResults: item.descendants ?? 0 } },
     text: item.text!,
-    type: itemType(item.type),
-  }
-}
-
-export function serializeUser(user: HNUser): User {
-  return {
-    __typename: 'User',
-    about: user.about,
-    karma: user.karma,
-    username: user.id,
+    type: ItemType.Comment,
   }
 }
 
@@ -56,7 +39,7 @@ export function serializeStory(item: Item): Story {
     __typename: 'Story',
     id: item.id,
     title: item.title ?? '',
-    type: itemType(item.type),
+    type: ItemType.Story,
     score: item.score,
     replies: { edges: [], pageInfo: { totalResults: item.descendants ?? 0 } },
     author,
