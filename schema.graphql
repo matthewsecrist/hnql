@@ -74,7 +74,7 @@ type PollOptionNode {
 }
 
 type PollOptionConnection {
-  pageInfo: PageInfo,
+  pageInfo: PageInfo
   edges: [PollOptionNode]!
 }
 
@@ -95,7 +95,7 @@ type UserItemNode {
 }
 
 type UserItemsConnection {
-  pageInfo: PageInfo,
+  pageInfo: PageInfo
   edges: [UserItemNode]!
 }
 
@@ -105,7 +105,6 @@ type User {
   username: ID!
   items(first: Int! = 10, after: Int): UserItemsConnection
 }
-
 
 union ItemResult = Story | Comment | Job | Poll | PollOption | NotFoundError
 union UserResult = User | NotFoundError

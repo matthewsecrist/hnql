@@ -2,6 +2,6 @@
   "recommendations": [
     "biomejs.biome",
     "GraphQL.vscode-graphql",
-    "GraphQL.vscode-graphql-execution",
+    "GraphQL.vscode-graphql-execution"
   ]
 }
