@@ -9,4 +9,3 @@ services:
     envVars:
       - key: SERVICE_ENV
         value: production
-g
