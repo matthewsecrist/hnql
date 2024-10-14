@@ -9,9 +9,10 @@
   "scripts": {
     "test": "npm run build:ts && tsc -p test/tsconfig.json && c8 node --test -r ts-node/register \"test/**/*.ts\"",
     "build": "tsc",
-    "dev": "nodemon -e ts --exec 'node -r ts-node/register -r tsconfig-paths/register ./src/index.ts'",
-    "lint": "biome check",
-    "codegen": "graphql-codegen --config codegen.ts"
+    "dev": "concurrently 'npm run dev:api' 'npm run dev:schema'",
+    "dev:schema": "graphql-codegen --config codegen.ts",
+    "dev:api": "nodemon -e ts --exec 'node -r ts-node/register -r tsconfig-paths/register ./src/index.ts'",
+    "lint": "biome check"
   },
   "keywords": [],
   "author": "Matthew Secrist",
@@ -35,9 +36,10 @@
     "@graphql-codegen/introspection": "4.0.3",
     "@graphql-codegen/typescript": "4.0.9",
     "@graphql-codegen/typescript-resolvers": "4.2.1",
+    "@parcel/watcher": "^2.4.1",
     "@types/node": "^22.1.0",
     "c8": "^10.1.2",
-    "concurrently": "^9.0.0",
+    "concurrently": "^9.0.1",
     "fastify-tsconfig": "^2.0.0",
     "nodemon": "^3.1.7",
     "pino-pretty": "^11.2.2",
