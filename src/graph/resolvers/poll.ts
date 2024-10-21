@@ -12,8 +12,6 @@ export const Poll: PollResolvers = {
       { after: Number(after), first },
     )
 
-    console.log(opts)
-
     return {
       pageInfo: {
         totalResults: parent.descendants ?? 0,

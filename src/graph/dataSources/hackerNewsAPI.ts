@@ -23,8 +23,33 @@ export interface User {
   submitted: number[]
 }
 
+export interface PaginationParams {
+  after?: number | undefined
+  first: number
+}
+
 export class HackerNewsAPI extends RESTDataSource {
   override baseURL = 'https://hacker-news.firebaseio.com'
+
+  private getPaginatedIds(
+    ids: number[],
+    { after, first }: PaginationParams,
+  ): number[] {
+    // Start at the beginning
+    let startingIndex = 0
+    if (after) {
+      const idx = ids.findIndex((id) => id === after)
+      if (idx === -1) {
+        // out of bounds, return at the end of ids
+        startingIndex = ids.length
+      } else {
+        // found index, move to next id
+        startingIndex = idx + 1
+      }
+    }
+
+    return ids.slice(startingIndex, first)
+  }
 
   private itemsLoader = new DataLoader(
     async (ids: readonly number[]): Promise<Item[]> => {
@@ -68,28 +93,99 @@ export class HackerNewsAPI extends RESTDataSource {
     return await this.itemsLoader.load(id)
   }
 
+  async getTopItems({ first = 10, after }: PaginationParams): Promise<{
+    total: number
+    results: Item[]
+  }> {
+    const ids = await this.get<number[]>('/v0/topstories.json?print=pretty')
+    const itemsToLoad = this.getPaginatedIds(ids, { first, after })
+    // Don't use batch because it returns Error | Item
+    const results = await Promise.all(
+      itemsToLoad?.map((id) => this.itemsLoader.load(id)),
+    )
+
+    return {
+      total: ids.length,
+      results,
+    }
+  }
+
+  async getJobs({
+    first = 10,
+    after,
+  }: PaginationParams): Promise<{ total: number; results: Item[] }> {
+    const ids = await this.get<number[]>('/v0/jobstories.json?print=pretty')
+    const itemsToLoad = this.getPaginatedIds(ids, { first, after })
+    // Don't use batch because it returns Error | Item
+    const results = await Promise.all(
+      itemsToLoad?.map((id) => this.itemsLoader.load(id)),
+    )
+
+    return {
+      total: ids.length,
+      results,
+    }
+  }
+
+  async getNew({
+    first = 10,
+    after,
+  }: PaginationParams): Promise<{ total: number; results: Item[] }> {
+    const ids = await this.get<number[]>('/v0/newstories.json?print=pretty')
+    const itemsToLoad = this.getPaginatedIds(ids, { first, after })
+    // Don't use batch because it returns Error | Item
+    const results = await Promise.all(
+      itemsToLoad?.map((id) => this.itemsLoader.load(id)),
+    )
+
+    return {
+      total: ids.length,
+      results,
+    }
+  }
+
+  async getAsk({
+    first = 10,
+    after,
+  }: PaginationParams): Promise<{ total: number; results: Item[] }> {
+    const ids = await this.get<number[]>('/v0/askstories.json?print=pretty')
+    const itemsToLoad = this.getPaginatedIds(ids, { first, after })
+    // Don't use batch because it returns Error | Item
+    const results = await Promise.all(
+      itemsToLoad?.map((id) => this.itemsLoader.load(id)),
+    )
+
+    return {
+      total: ids.length,
+      results,
+    }
+  }
+
+  async getBest({
+    first = 10,
+    after,
+  }: PaginationParams): Promise<{ total: number; results: Item[] }> {
+    const ids = await this.get<number[]>('/v0/beststories.json?print=pretty')
+    const itemsToLoad = this.getPaginatedIds(ids, { first, after })
+    // Don't use batch because it returns Error | Item
+    const results = await Promise.all(
+      itemsToLoad?.map((id) => this.itemsLoader.load(id)),
+    )
+
+    return {
+      total: ids.length,
+      results,
+    }
+  }
+
   async getItems(
     ids: number[],
-    { first = 10, after }: { first: number; after: number | undefined },
+    { first = 10, after }: PaginationParams,
   ): Promise<Item[]> {
     if (!ids?.length) {
       return []
     }
-
-    // Start at the beginning
-    let startingIndex = 0
-    if (after) {
-      const idx = ids.findIndex((id) => id === after)
-      if (idx === -1) {
-        // out of bounds, return at the end of ids
-        startingIndex = ids.length
-      } else {
-        // found index, move to next id
-        startingIndex = idx + 1
-      }
-    }
-
-    const itemsToLoad = ids.slice(startingIndex, startingIndex + first)
+    const itemsToLoad = this.getPaginatedIds(ids, { first, after })
     // Don't use batch because it returns Error | Item
     return await Promise.all(
       itemsToLoad?.map((id) => this.itemsLoader.load(id)),

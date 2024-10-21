@@ -71,6 +71,7 @@ export function serializeJob(item: Item): Job {
     score: item.score,
     title: item.title!,
     type: ItemType.Job,
+    url: item.url,
   }
 }
 
