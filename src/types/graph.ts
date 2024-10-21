@@ -44,6 +44,11 @@ export type Item = {
   type: ItemType;
 };
 
+export type ItemNode = {
+  __typename?: 'ItemNode';
+  node: ItemResult;
+};
+
 export type ItemResult = Comment | Job | NotFoundError | Poll | PollOption | Story;
 
 export enum ItemType {
@@ -54,6 +59,12 @@ export enum ItemType {
   Story = 'Story'
 }
 
+export type ItemsResult = {
+  __typename?: 'ItemsResult';
+  edges: Array<Maybe<ItemNode>>;
+  pageInfo?: Maybe<PageInfo>;
+};
+
 export type Job = Item & {
   __typename?: 'Job';
   author: User;
@@ -61,6 +72,18 @@ export type Job = Item & {
   score?: Maybe<Scalars['Int']['output']>;
   title: Scalars['String']['output'];
   type: ItemType;
+  url?: Maybe<Scalars['String']['output']>;
+};
+
+export type JobItemNode = {
+  __typename?: 'JobItemNode';
+  node: Job;
+};
+
+export type JobsResult = {
+  __typename?: 'JobsResult';
+  edges: Array<Maybe<JobItemNode>>;
+  pageInfo?: Maybe<PageInfo>;
 };
 
 export type NotFoundError = Error & {
@@ -119,13 +142,48 @@ export type PollOptionNode = {
 
 export type Query = {
   __typename?: 'Query';
+  ask: ItemsResult;
+  best: ItemsResult;
   item: ItemResult;
+  jobs: JobsResult;
+  new: ItemsResult;
+  top: ItemsResult;
   user: UserResult;
+};
+
+
+export type QueryAskArgs = {
+  after?: InputMaybe<Scalars['Int']['input']>;
+  first?: Scalars['Int']['input'];
+};
+
+
+export type QueryBestArgs = {
+  after?: InputMaybe<Scalars['Int']['input']>;
+  first?: Scalars['Int']['input'];
 };
 
 
 export type QueryItemArgs = {
   id: Scalars['Int']['input'];
+};
+
+
+export type QueryJobsArgs = {
+  after?: InputMaybe<Scalars['Int']['input']>;
+  first?: Scalars['Int']['input'];
+};
+
+
+export type QueryNewArgs = {
+  after?: InputMaybe<Scalars['Int']['input']>;
+  first?: Scalars['Int']['input'];
+};
+
+
+export type QueryTopArgs = {
+  after?: InputMaybe<Scalars['Int']['input']>;
+  first?: Scalars['Int']['input'];
 };
 
 
@@ -278,9 +336,13 @@ export type ResolversTypes = {
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Item: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Item']>;
+  ItemNode: ResolverTypeWrapper<Omit<ItemNode, 'node'> & { node: ResolversTypes['ItemResult'] }>;
   ItemResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['ItemResult']>;
   ItemType: ItemType;
+  ItemsResult: ResolverTypeWrapper<Omit<ItemsResult, 'edges'> & { edges: Array<Maybe<ResolversTypes['ItemNode']>> }>;
   Job: ResolverTypeWrapper<Omit<Job, 'author'> & { author: ResolversTypes['User'] }>;
+  JobItemNode: ResolverTypeWrapper<Omit<JobItemNode, 'node'> & { node: ResolversTypes['Job'] }>;
+  JobsResult: ResolverTypeWrapper<Omit<JobsResult, 'edges'> & { edges: Array<Maybe<ResolversTypes['JobItemNode']>> }>;
   NotFoundError: ResolverTypeWrapper<NotFoundError>;
   PageInfo: ResolverTypeWrapper<PageInfo>;
   Poll: ResolverTypeWrapper<Omit<Poll, 'author' | 'options' | 'replies'> & { author: ResolversTypes['User'], options: ResolversTypes['PollOptionConnection'], replies: ResolversTypes['RepliesConnection'] }>;
@@ -307,8 +369,12 @@ export type ResolversParentTypes = {
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
   Item: ResolversInterfaceTypes<ResolversParentTypes>['Item'];
+  ItemNode: Omit<ItemNode, 'node'> & { node: ResolversParentTypes['ItemResult'] };
   ItemResult: ResolversUnionTypes<ResolversParentTypes>['ItemResult'];
+  ItemsResult: Omit<ItemsResult, 'edges'> & { edges: Array<Maybe<ResolversParentTypes['ItemNode']>> };
   Job: Omit<Job, 'author'> & { author: ResolversParentTypes['User'] };
+  JobItemNode: Omit<JobItemNode, 'node'> & { node: ResolversParentTypes['Job'] };
+  JobsResult: Omit<JobsResult, 'edges'> & { edges: Array<Maybe<ResolversParentTypes['JobItemNode']>> };
   NotFoundError: NotFoundError;
   PageInfo: PageInfo;
   Poll: Omit<Poll, 'author' | 'options' | 'replies'> & { author: ResolversParentTypes['User'], options: ResolversParentTypes['PollOptionConnection'], replies: ResolversParentTypes['RepliesConnection'] };
@@ -349,8 +415,19 @@ export type ItemResolvers<ContextType = Context, ParentType extends ResolversPar
   type?: Resolver<ResolversTypes['ItemType'], ParentType, ContextType>;
 };
 
+export type ItemNodeResolvers<ContextType = Context, ParentType extends ResolversParentTypes['ItemNode'] = ResolversParentTypes['ItemNode']> = {
+  node?: Resolver<ResolversTypes['ItemResult'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type ItemResultResolvers<ContextType = Context, ParentType extends ResolversParentTypes['ItemResult'] = ResolversParentTypes['ItemResult']> = {
   __resolveType: TypeResolveFn<'Comment' | 'Job' | 'NotFoundError' | 'Poll' | 'PollOption' | 'Story', ParentType, ContextType>;
+};
+
+export type ItemsResultResolvers<ContextType = Context, ParentType extends ResolversParentTypes['ItemsResult'] = ResolversParentTypes['ItemsResult']> = {
+  edges?: Resolver<Array<Maybe<ResolversTypes['ItemNode']>>, ParentType, ContextType>;
+  pageInfo?: Resolver<Maybe<ResolversTypes['PageInfo']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type JobResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Job'] = ResolversParentTypes['Job']> = {
@@ -359,6 +436,18 @@ export type JobResolvers<ContextType = Context, ParentType extends ResolversPare
   score?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   type?: Resolver<ResolversTypes['ItemType'], ParentType, ContextType>;
+  url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type JobItemNodeResolvers<ContextType = Context, ParentType extends ResolversParentTypes['JobItemNode'] = ResolversParentTypes['JobItemNode']> = {
+  node?: Resolver<ResolversTypes['Job'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type JobsResultResolvers<ContextType = Context, ParentType extends ResolversParentTypes['JobsResult'] = ResolversParentTypes['JobsResult']> = {
+  edges?: Resolver<Array<Maybe<ResolversTypes['JobItemNode']>>, ParentType, ContextType>;
+  pageInfo?: Resolver<Maybe<ResolversTypes['PageInfo']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -405,7 +494,12 @@ export type PollOptionNodeResolvers<ContextType = Context, ParentType extends Re
 };
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  ask?: Resolver<ResolversTypes['ItemsResult'], ParentType, ContextType, RequireFields<QueryAskArgs, 'first'>>;
+  best?: Resolver<ResolversTypes['ItemsResult'], ParentType, ContextType, RequireFields<QueryBestArgs, 'first'>>;
   item?: Resolver<ResolversTypes['ItemResult'], ParentType, ContextType, RequireFields<QueryItemArgs, 'id'>>;
+  jobs?: Resolver<ResolversTypes['JobsResult'], ParentType, ContextType, RequireFields<QueryJobsArgs, 'first'>>;
+  new?: Resolver<ResolversTypes['ItemsResult'], ParentType, ContextType, RequireFields<QueryNewArgs, 'first'>>;
+  top?: Resolver<ResolversTypes['ItemsResult'], ParentType, ContextType, RequireFields<QueryTopArgs, 'first'>>;
   user?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<QueryUserArgs, 'username'>>;
 };
 
@@ -462,8 +556,12 @@ export type Resolvers<ContextType = Context> = {
   Comment?: CommentResolvers<ContextType>;
   Error?: ErrorResolvers<ContextType>;
   Item?: ItemResolvers<ContextType>;
+  ItemNode?: ItemNodeResolvers<ContextType>;
   ItemResult?: ItemResultResolvers<ContextType>;
+  ItemsResult?: ItemsResultResolvers<ContextType>;
   Job?: JobResolvers<ContextType>;
+  JobItemNode?: JobItemNodeResolvers<ContextType>;
+  JobsResult?: JobsResultResolvers<ContextType>;
   NotFoundError?: NotFoundErrorResolvers<ContextType>;
   PageInfo?: PageInfoResolvers<ContextType>;
   Poll?: PollResolvers<ContextType>;

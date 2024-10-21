@@ -59,6 +59,7 @@ type Job implements Item {
   score: Int
   title: String!
   type: ItemType!
+  url: String
 }
 
 type PollOption implements Item {
@@ -109,7 +110,30 @@ type User {
 union ItemResult = Story | Comment | Job | Poll | PollOption | NotFoundError
 union UserResult = User | NotFoundError
 
+type ItemNode {
+  node: ItemResult!
+}
+
+type ItemsResult {
+  pageInfo: PageInfo,
+  edges: [ItemNode]!
+}
+
+type JobItemNode {
+  node: Job!
+}
+
+type JobsResult {
+  pageInfo: PageInfo,
+  edges: [JobItemNode]!
+}
+
 type Query {
+  ask(first: Int! = 10, after: Int): ItemsResult!
+  best(first: Int! = 10, after: Int): ItemsResult!
   item(id: Int!): ItemResult!
+  jobs(first: Int! = 10, after: Int): JobsResult!
+  new(first: Int! = 10, after: Int): ItemsResult!
+  top(first: Int! = 10, after: Int): ItemsResult!
   user(username: ID!): UserResult!
 }
